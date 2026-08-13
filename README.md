@@ -17,6 +17,16 @@
 - **校验**：`node 2026-08-11-09-37-38/test/validate.mjs` 校验词库（词数 ≥120、分类 ≥8、en 不重复、字段完整）。
 - **后端**：`cloudfunctions/wordProgress/index.js` 为 CloudBase 云函数，使用 `@cloudbase/node-sdk` 读写进度数据。
 
+## 预览
+
+### 网页端（桌面）
+
+![网页端预览](docs/images/web-preview.png)
+
+### App 端（移动）
+
+![App端预览](docs/images/app-preview.png)
+
 ## 仓库发布文件
 
 本仓库已按 GitHub 发布标准补齐以下文件：
