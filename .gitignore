@@ -2,3 +2,28 @@
 .workbuddy/
 node_modules/
 *.log
+
+# 密钥与凭据（严禁提交）
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+credentials.json
+service-account*.json
+
+# 本地数据库与导出
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.backup
+
+# 缓存与临时
+.cache/
+*.tmp
+*.swp
