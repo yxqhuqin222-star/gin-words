@@ -66,3 +66,44 @@ cats
   .sort()
   .forEach((c) => console.log(`  ${c}: ${catCount[c]}`));
 console.log("✓ 全部校验通过");
+
+// ===== 常用句（sentence-data）校验 =====
+const SENT_MIN = 100;
+const SENT_MIN_CATS = 5;
+const sm = html.match(
+  /<script type="application\/json" id="sentence-data">([\s\S]*?)<\/script>/
+);
+if (!sm) {
+  console.error("✗ 找不到句库脚本块（sentence-data）");
+  process.exit(1);
+}
+let sentences;
+try {
+  sentences = JSON.parse(sm[1]);
+} catch (e) {
+  console.error("✗ 句库 JSON 解析失败：", e.message);
+  process.exit(1);
+}
+const sErrors = [];
+if (!Array.isArray(sentences)) sErrors.push("句库不是数组");
+if (sentences.length < SENT_MIN)
+  sErrors.push(`句数 ${sentences.length} < 最低 ${SENT_MIN}`);
+const sCatCount = {};
+sentences.forEach((w, i) => {
+  const at = `句 ${i + 1}`;
+  if (typeof w.en !== "string" || !w.en.trim()) sErrors.push(`${at} 缺 en`);
+  if (typeof w.zh !== "string" || !w.zh.trim()) sErrors.push(`${at} 缺 zh`);
+  if (typeof w.cat !== "string" || !w.cat.trim()) sErrors.push(`${at} 缺 cat`);
+  if (w.cat) sCatCount[w.cat] = (sCatCount[w.cat] || 0) + 1;
+});
+const sCats = Object.keys(sCatCount);
+if (sCats.length < SENT_MIN_CATS)
+  sErrors.push(`句库分类数 ${sCats.length} < 最低 ${SENT_MIN_CATS}`);
+if (sErrors.length) {
+  console.error("常用句验收未通过：");
+  sErrors.forEach((e) => console.error("  - " + e));
+  process.exit(1);
+}
+console.log(`✓ 句数：${sentences.length}（≥${SENT_MIN}）`);
+console.log(`✓ 句库分类数：${sCats.length}（≥${SENT_MIN_CATS}）`);
+console.log("✓ 常用句校验通过");

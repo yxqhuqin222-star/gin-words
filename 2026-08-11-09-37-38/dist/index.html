@@ -81,12 +81,20 @@
   .login-input:focus{border-color:var(--accent);}
   .account-tag{color:var(--accent); background:var(--accent-soft); border-radius:6px; padding:2px 8px; font-size:12px;}
   .login-hint{margin-top:6px; font-size:12px; color:#b06a00; background:#fff7e6; border:1px solid #ffd591; border-radius:8px; padding:6px 10px;}
+  .mode-tabs{display:flex; gap:8px; margin:12px 0 6px;}
+  .mode-tab{font-size:14px; padding:7px 18px; border:1px solid var(--line); background:#fff; color:var(--text); border-radius:999px; cursor:pointer; transition:border-color .15s, background .15s, color .15s;}
+  .mode-tab:hover{border-color:var(--accent);}
+  .mode-tab.active{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600;}
 </style>
 </head>
 <body>
 <header>
-  <h1>欧洲旅游英语单词卡</h1>
-  <p class="sub">点卡片或喇叭即可朗读 · 按场景筛选 · 中英对照</p>
+  <h1>欧洲旅游英语随身学</h1>
+  <p class="sub">单词卡 / 常用句 · 点卡片或喇叭即可朗读 · 中英对照 · 按场景筛选</p>
+  <div class="mode-tabs" role="tablist" aria-label="学习模式">
+    <button type="button" class="mode-tab active" data-mode="words" role="tab">单词卡</button>
+    <button type="button" class="mode-tab" data-mode="sentences" role="tab">常用句</button>
+  </div>
   <div class="controls">
     <select id="catFilter" aria-label="分类筛选"><option value="">全部分类</option></select>
     <input type="search" id="search" placeholder="搜索英文 / 中文 / 例句…" aria-label="搜索">
@@ -106,7 +114,7 @@
 </header>
 <div id="status" role="status" aria-live="polite"></div>
 <main id="list"></main>
-<footer>共 <span id="total">0</span> 个单词 · 数据本地内嵌，无需联网</footer>
+<footer>共 <span id="total">0</span> 个<span id="noun">单词</span> · 数据本地内嵌，无需联网</footer>
 
 <script type="application/json" id="word-data">
 [
@@ -273,6 +281,242 @@
   {"en":"tired","zh":"累","cat":"日常表达","phrase":"I am a bit tired."}
 ]
 </script>
+<script type="application/json" id="sentence-data">
+[
+  {"en": "Where is the check-in counter?", "zh": "值机柜台在哪里？", "cat": "机场海关", "phrase": ""},
+  {"en": "I'd like to check in.", "zh": "我想办理值机。", "cat": "机场海关", "phrase": ""},
+  {"en": "Here's my passport.", "zh": "这是我的护照。", "cat": "机场海关", "phrase": ""},
+  {"en": "I'm here for tourism.", "zh": "我是来旅游的。", "cat": "机场海关", "phrase": ""},
+  {"en": "I'll stay for two weeks.", "zh": "我会停留两周。", "cat": "机场海关", "phrase": ""},
+  {"en": "I have a reservation.", "zh": "我有预订。", "cat": "酒店", "phrase": ""},
+  {"en": "I'd like to check in.", "zh": "我想办理入住。", "cat": "酒店", "phrase": ""},
+  {"en": "The reservation is under the name Zhang.", "zh": "预订名字是 Zhang。", "cat": "酒店", "phrase": ""},
+  {"en": "Here's my passport.", "zh": "这是我的护照。", "cat": "酒店", "phrase": ""},
+  {"en": "Is breakfast included?", "zh": "包含早餐吗？", "cat": "酒店", "phrase": ""},
+  {"en": "What time is breakfast?", "zh": "早餐几点？", "cat": "酒店", "phrase": ""},
+  {"en": "Where is the breakfast room?", "zh": "早餐餐厅在哪里？", "cat": "酒店", "phrase": ""},
+  {"en": "Could I have the Wi-Fi password?", "zh": "请问 Wi‑Fi 密码是多少？", "cat": "酒店", "phrase": ""},
+  {"en": "The Wi-Fi isn't working.", "zh": "Wi‑Fi 不能用。", "cat": "酒店", "phrase": ""},
+  {"en": "The air conditioner isn't working.", "zh": "空调坏了。", "cat": "酒店", "phrase": ""},
+  {"en": "There isn't any hot water.", "zh": "没有热水。", "cat": "酒店", "phrase": ""},
+  {"en": "Could you send someone to check it?", "zh": "可以请人来看一下吗？", "cat": "酒店", "phrase": ""},
+  {"en": "Could I have another towel?", "zh": "可以再给我一条毛巾吗？", "cat": "酒店", "phrase": ""},
+  {"en": "Could I have another pillow?", "zh": "可以再给我一个枕头吗？", "cat": "酒店", "phrase": ""},
+  {"en": "Could I have an extra blanket?", "zh": "可以再给我一条毯子吗？", "cat": "酒店", "phrase": ""},
+  {"en": "Could I check out later?", "zh": "可以延迟退房吗？", "cat": "酒店", "phrase": ""},
+  {"en": "Could you keep my luggage?", "zh": "可以寄存行李吗？", "cat": "酒店", "phrase": ""},
+  {"en": "I'd like to check out.", "zh": "我要退房。", "cat": "酒店", "phrase": ""},
+  {"en": "Could I have the receipt?", "zh": "可以给我收据吗？", "cat": "酒店", "phrase": ""},
+  {"en": "Can I pay by card?", "zh": "可以刷卡吗？", "cat": "酒店", "phrase": ""},
+  {"en": "Could I have an espresso, please?", "zh": "我要一杯浓缩咖啡。", "cat": "咖啡店", "phrase": ""},
+  {"en": "I'd like a latte, please.", "zh": "我要一杯拿铁。", "cat": "咖啡店", "phrase": ""},
+  {"en": "Could I have a cappuccino, please?", "zh": "我要一杯卡布奇诺。", "cat": "咖啡店", "phrase": ""},
+  {"en": "Could I have a flat white?", "zh": "我要一杯澳白。", "cat": "咖啡店", "phrase": ""},
+  {"en": "Could I have an Americano?", "zh": "我要一杯美式。", "cat": "咖啡店", "phrase": ""},
+  {"en": "I'd like an iced latte.", "zh": "我要一杯冰拿铁。", "cat": "咖啡店", "phrase": ""},
+  {"en": "No sugar, please.", "zh": "不要糖。", "cat": "咖啡店", "phrase": ""},
+  {"en": "No ice, please.", "zh": "不要冰。", "cat": "咖啡店", "phrase": ""},
+  {"en": "Could I have oat milk?", "zh": "可以换燕麦奶吗？", "cat": "咖啡店", "phrase": ""},
+  {"en": "Could I have soy milk?", "zh": "可以换豆奶吗？", "cat": "咖啡店", "phrase": ""},
+  {"en": "For here, please.", "zh": "堂食。", "cat": "咖啡店", "phrase": ""},
+  {"en": "To go, please.", "zh": "打包。", "cat": "咖啡店", "phrase": ""},
+  {"en": "That's all, thanks.", "zh": "就这些，谢谢。", "cat": "咖啡店", "phrase": ""},
+  {"en": "Anything else?", "zh": "还需要别的吗？", "cat": "咖啡店", "phrase": ""},
+  {"en": "Can I pay by card?", "zh": "可以刷卡吗？", "cat": "咖啡店", "phrase": ""},
+  {"en": "Can I have the receipt?", "zh": "可以给我小票吗？", "cat": "咖啡店", "phrase": ""},
+  {"en": "Thank you. Have a nice day!", "zh": "谢谢，祝你今天愉快！", "cat": "咖啡店", "phrase": ""},
+  {"en": "Do you have any recommendations?", "zh": "有什么推荐吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "What's your most popular dish?", "zh": "最受欢迎的菜是什么？", "cat": "餐厅", "phrase": ""},
+  {"en": "Could I see the menu, please?", "zh": "可以看一下菜单吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Could I have an English menu?", "zh": "有英文菜单吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "I'll have this one.", "zh": "我要这个。", "cat": "餐厅", "phrase": ""},
+  {"en": "I'd like to order.", "zh": "我想点餐。", "cat": "餐厅", "phrase": ""},
+  {"en": "Could I get this without onions?", "zh": "不要洋葱。", "cat": "餐厅", "phrase": ""},
+  {"en": "No spicy, please.", "zh": "不要辣。", "cat": "餐厅", "phrase": ""},
+  {"en": "I'm allergic to peanuts.", "zh": "我对花生过敏。", "cat": "餐厅", "phrase": ""},
+  {"en": "Could I have some water, please?", "zh": "请给我一些水。", "cat": "餐厅", "phrase": ""},
+  {"en": "Sparkling water, please.", "zh": "请给我气泡水。", "cat": "餐厅", "phrase": ""},
+  {"en": "Still water, please.", "zh": "请给我矿泉水。", "cat": "餐厅", "phrase": ""},
+  {"en": "Could I have another fork?", "zh": "可以再给我一把叉子吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Could I have another plate?", "zh": "可以再给我一个盘子吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Everything is delicious.", "zh": "很好吃。", "cat": "餐厅", "phrase": ""},
+  {"en": "This is amazing.", "zh": "这个太好吃了。", "cat": "餐厅", "phrase": ""},
+  {"en": "Medium, please.", "zh": "五分熟。", "cat": "餐厅", "phrase": ""},
+  {"en": "Medium rare, please.", "zh": "三分熟。", "cat": "餐厅", "phrase": ""},
+  {"en": "Well done, please.", "zh": "全熟。", "cat": "餐厅", "phrase": ""},
+  {"en": "Could we get the bill, please?", "zh": "请结账。", "cat": "餐厅", "phrase": ""},
+  {"en": "Can we split the bill?", "zh": "可以分开付款吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "We'll pay together.", "zh": "我们一起付款。", "cat": "餐厅", "phrase": ""},
+  {"en": "Can I pay by card?", "zh": "可以刷卡吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Can I have the receipt?", "zh": "可以给我小票吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Thank you for the meal.", "zh": "谢谢，很美味。", "cat": "餐厅", "phrase": ""},
+  {"en": "Cheers!", "zh": "干杯！", "cat": "餐厅", "phrase": ""},
+  {"en": "Could I have another glass of wine?", "zh": "再来一杯葡萄酒。", "cat": "餐厅", "phrase": ""},
+  {"en": "I'd like a beer.", "zh": "我要一杯啤酒。", "cat": "餐厅", "phrase": ""},
+  {"en": "Do you have any desserts?", "zh": "有甜点吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "We'll share this.", "zh": "我们一起分享这个。", "cat": "餐厅", "phrase": ""},
+  {"en": "Could we have the dessert menu?", "zh": "可以看甜品菜单吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Is service included?", "zh": "服务费包含了吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Keep the change.", "zh": "不用找了。", "cat": "餐厅", "phrase": ""},
+  {"en": "Everything was great.", "zh": "一切都很好。", "cat": "餐厅", "phrase": ""},
+  {"en": "Could we have some bread?", "zh": "可以来一点面包吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Excuse me.", "zh": "不好意思，打扰一下。", "cat": "餐厅", "phrase": ""},
+  {"en": "We're ready to order.", "zh": "我们可以点餐了。", "cat": "餐厅", "phrase": ""},
+  {"en": "Could I change my order?", "zh": "我可以修改一下点单吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Could I take this to go?", "zh": "可以打包吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "Can I have a takeaway box?", "zh": "可以给我一个打包盒吗？", "cat": "餐厅", "phrase": ""},
+  {"en": "I'm just browsing, thanks.", "zh": "我随便看看，谢谢。", "cat": "购物退税", "phrase": ""},
+  {"en": "I'm looking for a handbag.", "zh": "我想看看包。", "cat": "购物退税", "phrase": ""},
+  {"en": "I'm looking for a jacket.", "zh": "我想买一件外套。", "cat": "购物退税", "phrase": ""},
+  {"en": "Do you have another size?", "zh": "有其他尺码吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Do you have this in black?", "zh": "有黑色的吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Do you have this in another color?", "zh": "有其他颜色吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Could I try this on?", "zh": "我可以试穿吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Where is the fitting room?", "zh": "试衣间在哪里？", "cat": "购物退税", "phrase": ""},
+  {"en": "It fits perfectly.", "zh": "非常合身。", "cat": "购物退税", "phrase": ""},
+  {"en": "It's too big.", "zh": "太大了。", "cat": "购物退税", "phrase": ""},
+  {"en": "It's too small.", "zh": "太小了。", "cat": "购物退税", "phrase": ""},
+  {"en": "I'll take it.", "zh": "我要这个。", "cat": "购物退税", "phrase": ""},
+  {"en": "How much is it?", "zh": "多少钱？", "cat": "购物退税", "phrase": ""},
+  {"en": "Is there any discount?", "zh": "有折扣吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Can I pay by card?", "zh": "可以刷卡吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Can I have the receipt?", "zh": "可以给我小票吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Could you wrap it as a gift?", "zh": "可以帮我包装成礼物吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Is this eligible for a VAT refund?", "zh": "这个可以退税吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Could you help me with the VAT refund?", "zh": "可以帮我办理退税吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Where can I get my VAT refund?", "zh": "我在哪里办理退税？", "cat": "购物退税", "phrase": ""},
+  {"en": "Do I need my passport?", "zh": "需要护照吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Here's my passport.", "zh": "这是我的护照。", "cat": "购物退税", "phrase": ""},
+  {"en": "Could you fill out the tax refund form?", "zh": "可以帮我填写退税单吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Where is customs?", "zh": "海关在哪里？", "cat": "购物退税", "phrase": ""},
+  {"en": "Where can I get the customs stamp?", "zh": "在哪里盖海关章？", "cat": "购物退税", "phrase": ""},
+  {"en": "Is this duty-free?", "zh": "这是免税商品吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "I'd like a shopping bag, please.", "zh": "请给我一个购物袋。", "cat": "购物退税", "phrase": ""},
+  {"en": "Can I exchange this?", "zh": "可以换货吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Can I return this?", "zh": "可以退货吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "What's your return policy?", "zh": "你们的退货政策是什么？", "cat": "购物退税", "phrase": ""},
+  {"en": "Do you have this in stock?", "zh": "这个有现货吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "I'll think about it.", "zh": "我再考虑一下。", "cat": "购物退税", "phrase": ""},
+  {"en": "I'm just comparing.", "zh": "我再比较一下。", "cat": "购物退税", "phrase": ""},
+  {"en": "Can I see this one?", "zh": "我可以看看这个吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "May I touch it?", "zh": "我可以摸一下吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Is this made in Italy?", "zh": "这是意大利制造的吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Is this genuine leather?", "zh": "这是真皮吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Could you recommend one?", "zh": "可以推荐一下吗？", "cat": "购物退税", "phrase": ""},
+  {"en": "Thank you for your help.", "zh": "谢谢你的帮助。", "cat": "购物退税", "phrase": ""},
+  {"en": "Have a nice day!", "zh": "祝你今天愉快！", "cat": "购物退税", "phrase": ""},
+  {"en": "Where is the train station?", "zh": "火车站在哪里？", "cat": "交通问路", "phrase": ""},
+  {"en": "Which platform does the train leave from?", "zh": "火车从几号站台发车？", "cat": "交通问路", "phrase": ""},
+  {"en": "Is this train going to Interlaken?", "zh": "这趟火车去因特拉肯吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "What time does the train leave?", "zh": "火车几点发车？", "cat": "交通问路", "phrase": ""},
+  {"en": "What time does it arrive?", "zh": "几点到达？", "cat": "交通问路", "phrase": ""},
+  {"en": "How long does the journey take?", "zh": "全程需要多久？", "cat": "交通问路", "phrase": ""},
+  {"en": "Where should I get off?", "zh": "我应该在哪站下车？", "cat": "交通问路", "phrase": ""},
+  {"en": "Do I need to change trains?", "zh": "需要换乘吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Is this seat taken?", "zh": "这个座位有人吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Could you help me with my luggage?", "zh": "可以帮我拿一下行李吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Where can I buy a ticket?", "zh": "在哪里买票？", "cat": "交通问路", "phrase": ""},
+  {"en": "I'd like a one-way ticket.", "zh": "我要一张单程票。", "cat": "交通问路", "phrase": ""},
+  {"en": "I'd like a return ticket.", "zh": "我要一张往返票。", "cat": "交通问路", "phrase": ""},
+  {"en": "Could you take me to this address?", "zh": "请送我去这个地址。", "cat": "交通问路", "phrase": ""},
+  {"en": "Please stop here.", "zh": "请在这里停车。", "cat": "交通问路", "phrase": ""},
+  {"en": "How much is the fare?", "zh": "车费是多少？", "cat": "交通问路", "phrase": ""},
+  {"en": "Can I pay by card?", "zh": "可以刷卡吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Excuse me, could you help me?", "zh": "打扰一下，可以帮我吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "How do I get to the city center?", "zh": "怎么去市中心？", "cat": "交通问路", "phrase": ""},
+  {"en": "How do I get to the museum?", "zh": "怎么去博物馆？", "cat": "交通问路", "phrase": ""},
+  {"en": "Is it within walking distance?", "zh": "走路可以到吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Which way should I go?", "zh": "我应该往哪个方向走？", "cat": "交通问路", "phrase": ""},
+  {"en": "Should I turn left?", "zh": "我应该左转吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Should I turn right?", "zh": "我应该右转吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Go straight ahead.", "zh": "一直往前走。", "cat": "交通问路", "phrase": ""},
+  {"en": "How far is it?", "zh": "有多远？", "cat": "交通问路", "phrase": ""},
+  {"en": "How long does it take to walk?", "zh": "走路需要多久？", "cat": "交通问路", "phrase": ""},
+  {"en": "Could you show me on the map?", "zh": "可以在地图上指给我吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "I'm lost.", "zh": "我迷路了。", "cat": "交通问路", "phrase": ""},
+  {"en": "Thank you for your help.", "zh": "谢谢你的帮助。", "cat": "交通问路", "phrase": ""},
+  {"en": "Where is the nearest metro station?", "zh": "最近的地铁站在哪里？", "cat": "交通问路", "phrase": ""},
+  {"en": "Does this bus go to the airport?", "zh": "这辆公交去机场吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Which line should I take?", "zh": "我应该坐哪条线路？", "cat": "交通问路", "phrase": ""},
+  {"en": "Is this the right train?", "zh": "这是正确的火车吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Could you tell me when to get off?", "zh": "到站时可以提醒我吗？", "cat": "交通问路", "phrase": ""},
+  {"en": "Thank you. Have a nice day!", "zh": "谢谢，祝你今天愉快！", "cat": "交通问路", "phrase": ""},
+  {"en": "Could I have an espresso, please?", "zh": "我要一杯浓缩咖啡。", "cat": "意大利", "phrase": ""},
+  {"en": "Could I have two scoops of gelato?", "zh": "我要两个球的冰淇淋。", "cat": "意大利", "phrase": ""},
+  {"en": "One slice of pizza, please.", "zh": "请给我一片披萨。", "cat": "意大利", "phrase": ""},
+  {"en": "Could I have the pasta of the day?", "zh": "我要今日特色意面。", "cat": "意大利", "phrase": ""},
+  {"en": "Is this homemade?", "zh": "这是手工制作的吗？", "cat": "意大利", "phrase": ""},
+  {"en": "Could we sit outside?", "zh": "我们可以坐外面吗？", "cat": "意大利", "phrase": ""},
+  {"en": "Can I pay by card?", "zh": "可以刷卡吗？", "cat": "意大利", "phrase": ""},
+  {"en": "Where is the cathedral?", "zh": "大教堂在哪里？", "cat": "意大利", "phrase": ""},
+  {"en": "Where can I buy tickets?", "zh": "在哪里买票？", "cat": "意大利", "phrase": ""},
+  {"en": "Could you recommend a local restaurant?", "zh": "可以推荐一家当地餐厅吗？", "cat": "意大利", "phrase": ""},
+  {"en": "Is the cable car operating today?", "zh": "今天缆车开放吗？", "cat": "瑞士", "phrase": ""},
+  {"en": "What's the weather like at the top?", "zh": "山顶天气怎么样？", "cat": "瑞士", "phrase": ""},
+  {"en": "Is this train going to Jungfraujoch?", "zh": "这趟车去少女峰吗？", "cat": "瑞士", "phrase": ""},
+  {"en": "Where can I buy a Swiss Travel Pass?", "zh": "哪里可以买瑞士旅行通票？", "cat": "瑞士", "phrase": ""},
+  {"en": "Is breakfast included?", "zh": "包含早餐吗？", "cat": "瑞士", "phrase": ""},
+  {"en": "Can I refill my water bottle here?", "zh": "这里可以接水吗？", "cat": "瑞士", "phrase": ""},
+  {"en": "Is this hiking trail open?", "zh": "这条徒步路线开放吗？", "cat": "瑞士", "phrase": ""},
+  {"en": "How long is the hike?", "zh": "徒步需要多久？", "cat": "瑞士", "phrase": ""},
+  {"en": "Is the view clear today?", "zh": "今天天气适合看风景吗？", "cat": "瑞士", "phrase": ""},
+  {"en": "Where is the cable car station?", "zh": "缆车站在哪里？", "cat": "瑞士", "phrase": ""},
+  {"en": "Bonjour.", "zh": "您好。", "cat": "法国", "phrase": ""},
+  {"en": "Merci.", "zh": "谢谢。", "cat": "法国", "phrase": ""},
+  {"en": "Au revoir.", "zh": "再见。", "cat": "法国", "phrase": ""},
+  {"en": "Could I have one croissant, please?", "zh": "我要一个可颂。", "cat": "法国", "phrase": ""},
+  {"en": "Could I have a baguette, please?", "zh": "我要一根法棍。", "cat": "法国", "phrase": ""},
+  {"en": "Could we sit outside?", "zh": "我们可以坐外面吗？", "cat": "法国", "phrase": ""},
+  {"en": "Is this eligible for a VAT refund?", "zh": "这个可以退税吗？", "cat": "法国", "phrase": ""},
+  {"en": "Could you help me with the VAT refund?", "zh": "可以帮我办理退税吗？", "cat": "法国", "phrase": ""},
+  {"en": "Where is the Louvre Museum?", "zh": "卢浮宫在哪里？", "cat": "法国", "phrase": ""},
+  {"en": "Could I take photos here?", "zh": "这里可以拍照吗？", "cat": "法国", "phrase": ""},
+  {"en": "Where are you from?", "zh": "你来自哪里？", "cat": "闲聊", "phrase": ""},
+  {"en": "I'm from China.", "zh": "我来自中国。", "cat": "闲聊", "phrase": ""},
+  {"en": "I'm traveling around Europe.", "zh": "我在欧洲旅行。", "cat": "闲聊", "phrase": ""},
+  {"en": "I'm here on vacation.", "zh": "我是来度假的。", "cat": "闲聊", "phrase": ""},
+  {"en": "Is this your first time here?", "zh": "这是你第一次来这里吗？", "cat": "闲聊", "phrase": ""},
+  {"en": "Have you been here before?", "zh": "你以前来过这里吗？", "cat": "闲聊", "phrase": ""},
+  {"en": "How are you enjoying your trip?", "zh": "你的旅行怎么样？", "cat": "闲聊", "phrase": ""},
+  {"en": "It's a beautiful city.", "zh": "这是座很美的城市。", "cat": "闲聊", "phrase": ""},
+  {"en": "Do you have any recommendations?", "zh": "有什么推荐吗？", "cat": "闲聊", "phrase": ""},
+  {"en": "What's your favorite place here?", "zh": "你最喜欢这里的哪个地方？", "cat": "闲聊", "phrase": ""},
+  {"en": "The food is amazing.", "zh": "这里的食物很好吃。", "cat": "闲聊", "phrase": ""},
+  {"en": "The weather is perfect today.", "zh": "今天天气真好。", "cat": "闲聊", "phrase": ""},
+  {"en": "Could you take a photo for me?", "zh": "可以帮我拍张照吗？", "cat": "闲聊", "phrase": ""},
+  {"en": "Of course!", "zh": "当然可以！", "cat": "闲聊", "phrase": ""},
+  {"en": "Thank you so much.", "zh": "非常感谢。", "cat": "闲聊", "phrase": ""},
+  {"en": "It was nice talking to you.", "zh": "很高兴和你聊天。", "cat": "闲聊", "phrase": ""},
+  {"en": "Have a great day!", "zh": "祝你今天愉快！", "cat": "闲聊", "phrase": ""},
+  {"en": "I need help.", "zh": "我需要帮助。", "cat": "紧急情况", "phrase": ""},
+  {"en": "I lost my passport.", "zh": "我的护照丢了。", "cat": "紧急情况", "phrase": ""},
+  {"en": "I lost my wallet.", "zh": "我的钱包丢了。", "cat": "紧急情况", "phrase": ""},
+  {"en": "My phone is out of battery.", "zh": "我的手机没电了。", "cat": "紧急情况", "phrase": ""},
+  {"en": "Please call the police.", "zh": "请帮我报警。", "cat": "紧急情况", "phrase": ""},
+  {"en": "I need a doctor.", "zh": "我需要医生。", "cat": "紧急情况", "phrase": ""},
+  {"en": "Where is the nearest hospital?", "zh": "最近的医院在哪里？", "cat": "紧急情况", "phrase": ""},
+  {"en": "Can you call an ambulance?", "zh": "可以帮我叫救护车吗？", "cat": "紧急情况", "phrase": ""},
+  {"en": "I don't feel well.", "zh": "我不舒服。", "cat": "紧急情况", "phrase": ""},
+  {"en": "I'm allergic to peanuts.", "zh": "我对花生过敏。", "cat": "紧急情况", "phrase": ""},
+  {"en": "Can you help me?", "zh": "可以帮帮我吗？", "cat": "紧急情况", "phrase": ""},
+  {"en": "Thank you for your help.", "zh": "谢谢你的帮助。", "cat": "紧急情况", "phrase": ""},
+  {"en": "Excuse me.", "zh": "打扰一下。", "cat": "万能句", "phrase": ""},
+  {"en": "Sorry.", "zh": "对不起。", "cat": "万能句", "phrase": ""},
+  {"en": "Thank you.", "zh": "谢谢。", "cat": "万能句", "phrase": ""},
+  {"en": "You're welcome.", "zh": "不客气。", "cat": "万能句", "phrase": ""},
+  {"en": "No worries.", "zh": "没关系。", "cat": "万能句", "phrase": ""},
+  {"en": "I don't understand.", "zh": "我没听懂。", "cat": "万能句", "phrase": ""},
+  {"en": "Could you say that again?", "zh": "可以再说一遍吗？", "cat": "万能句", "phrase": ""},
+  {"en": "Could you speak more slowly?", "zh": "可以说慢一点吗？", "cat": "万能句", "phrase": ""},
+  {"en": "Could you write it down?", "zh": "可以写下来吗？", "cat": "万能句", "phrase": ""},
+  {"en": "How much is it?", "zh": "多少钱？", "cat": "万能句", "phrase": ""},
+  {"en": "Can I pay by card?", "zh": "可以刷卡吗？", "cat": "万能句", "phrase": ""},
+  {"en": "Where is the restroom?", "zh": "洗手间在哪里？", "cat": "万能句", "phrase": ""},
+  {"en": "Where is the nearest ATM?", "zh": "最近的 ATM 在哪里？", "cat": "万能句", "phrase": ""},
+  {"en": "Could you help me?", "zh": "可以帮我一下吗？", "cat": "万能句", "phrase": ""},
+  {"en": "Thank you. Have a nice day!", "zh": "谢谢，祝你今天愉快！", "cat": "万能句", "phrase": ""}
+]
+</script>
 
 <script type="module">
 (function(){
@@ -286,11 +530,47 @@
     return;
   }
 
+  var SENTENCES = [];
+  try{
+    SENTENCES = JSON.parse(document.getElementById("sentence-data").textContent);
+  }catch(e){
+    console.error("句库解析失败：", e);
+    SENTENCES = [];
+  }
+
+  // 两种学习数据：单词卡 / 常用句
+  var DATASETS = {
+    words:     { key:"words",     items: WORDS,     noun:"单词" },
+    sentences: { key:"sentences", items: SENTENCES, noun:"句子" }
+  };
+  var activeKey = "words";
+  var items = DATASETS[activeKey].items;
+
   // ===== 学习进度（云端同步 + 本地兜底） =====
   // 云端接口：POST https://xiaoqin-d0g0prppaa09e675e.service.tcloudbase.com/wp
   // 入参 { action:"get"|"set", uid, mastered:[...] }，返回 { ok, mastered:[...] }
   var API = "https://xiaoqin-d0g0prppaa09e675e.service.tcloudbase.com/wp";
   var mastered = new Set();
+
+  // 进度按数据集分别存储：本地独立 key；云端仅 words（旧云函数不支持 scope 隔离，常用句纯本地）
+  (function(){
+    try{
+      if(!localStorage.getItem("wq_mastered_words") && localStorage.getItem("wq_mastered")){
+        localStorage.setItem("wq_mastered_words", localStorage.getItem("wq_mastered"));
+      }
+    }catch(e){}
+  })();
+  function loadLocalMastered(key){
+    try{
+      var raw = localStorage.getItem("wq_mastered_" + key);
+      if(raw){ var a = JSON.parse(raw); if(Array.isArray(a)) return new Set(a); }
+    }catch(e){}
+    return new Set();
+  }
+  function saveLocalMastered(key, set){
+    try{ localStorage.setItem("wq_mastered_" + key, JSON.stringify(Array.from(set))); }catch(e){}
+  }
+  mastered = loadLocalMastered(activeKey);
 
   // uid 来源：登录后用手机号派生的稳定 uid（跨设备一致）；未登录用本机随机 uid（仅本机）
   function genLocalUid(){
@@ -314,59 +594,49 @@
   }
 
   function updateProgress(){
-    if(progressEl) progressEl.textContent = "已掌握 " + mastered.size + " / " + WORDS.length;
+    if(progressEl) progressEl.textContent = "已掌握 " + mastered.size + " / " + items.length;
   }
 
   async function loadProgress(opts){
     opts = opts || {};
-    // 先用本地兜底填充，保证秒开
-    try{
-      var raw = localStorage.getItem("wq_mastered");
-      if(raw){
-        var list = JSON.parse(raw);
-        if(Array.isArray(list)){
-          mastered.clear();
-          list.forEach(function(en){ if(en) mastered.add(en); });
+    // 本地兜底优先：按当前数据集读取，保证秒开
+    mastered = loadLocalMastered(activeKey);
+    // 云端同步（仅 words 数据集，旧云函数不支持 scope 隔离）
+    if(activeKey === "words"){
+      try{
+        var res = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "get", uid: uid, scope: activeKey })
+        });
+        var r = await res.json();
+        if(r && r.ok && Array.isArray(r.mastered)){
+          if(opts.merge){
+            r.mastered.forEach(function(en){ if(en) mastered.add(en); });
+          }else{
+            mastered = new Set();
+            r.mastered.forEach(function(en){ if(en) mastered.add(en); });
+          }
         }
+      }catch(e){
+        console.warn("云端读取失败，使用本地进度：", e);
+        if(opts.showError) setStatus("同步失败，使用本地进度");
       }
-    }catch(e){ /* ignore */ }
-    // 再从云端拉取最新进度
-    try{
-      var res = await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "get", uid: uid })
-      });
-      var r = await res.json();
-      if(r && r.ok && Array.isArray(r.mastered)){
-        if(opts.merge){
-          // 合并模式：把云端进度合并进本地（用于登录时保留本机进度）
-          r.mastered.forEach(function(en){ if(en) mastered.add(en); });
-        }else{
-          // 覆盖模式：云端为准
-          mastered.clear();
-          r.mastered.forEach(function(en){ if(en) mastered.add(en); });
-        }
-      }
-    }catch(e){
-      console.warn("云端读取失败，使用本地进度：", e);
-      if(opts.showError) setStatus("同步失败，使用本地进度");
     }
     updateProgress();
     render();
   }
 
   async function saveProgress(){
-    // 本地兜底写入
-    try{
-      localStorage.setItem("wq_mastered", JSON.stringify(Array.from(mastered)));
-    }catch(e){ /* ignore */ }
-    // 云端同步
+    // 本地兜底写入（按当前数据集）
+    saveLocalMastered(activeKey, mastered);
+    // 云端同步（仅 words 数据集；常用句纯本地，避免污染旧云函数的单一进度字段）
+    if(activeKey !== "words") return;
     try{
       var res = await fetch(API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "set", uid: uid, mastered: Array.from(mastered) })
+        body: JSON.stringify({ action: "set", uid: uid, scope: activeKey, mastered: Array.from(mastered) })
       });
       var r = await res.json();
       if(r && r.ok){
@@ -393,6 +663,7 @@
   var statusEl   = document.getElementById("status");
   var countEl    = document.getElementById("count");
   var totalEl    = document.getElementById("total");
+  var nounEl     = document.getElementById("noun");
   var progressEl = document.getElementById("progress");
   var resetBtn   = document.getElementById("resetBtn");
   var accountLabel = document.getElementById("accountLabel");
@@ -446,15 +717,19 @@
     await loadProgress();
   });
 
-  // 分类下拉
-  var cats = [];
-  WORDS.forEach(function(w){ if(cats.indexOf(w.cat)<0) cats.push(w.cat); });
-  cats.sort();
-  cats.forEach(function(c){
-    var o = document.createElement("option");
-    o.value = c; o.textContent = c; catEl.appendChild(o);
-  });
-  totalEl.textContent = WORDS.length;
+  // 分类下拉（按当前数据集动态生成，切换模式时重建）
+  function populateCats(){
+    catEl.innerHTML = '<option value="">全部分类</option>';
+    var cats = [];
+    items.forEach(function(c){ if(cats.indexOf(c.cat)<0) cats.push(c.cat); });
+    cats.sort();
+    cats.forEach(function(c){
+      var o = document.createElement("option");
+      o.value = c; o.textContent = c; catEl.appendChild(o);
+    });
+  }
+  populateCats();
+  totalEl.textContent = items.length;
 
   var statusTimer = null;
   function setStatus(msg){
@@ -502,7 +777,7 @@
   function render(){
     var cat = catEl.value;
     var q = searchEl.value.trim().toLowerCase();
-    var items = WORDS.filter(function(w){
+    var filtered = items.filter(function(w){
       if(cat && w.cat !== cat) return false;
       if(q){
         var hay = (w.en + " " + w.zh + " " + (w.phrase||"")).toLowerCase();
@@ -511,13 +786,13 @@
       return true;
     });
     listEl.innerHTML = "";
-    if(!items.length){
-      listEl.innerHTML = '<div class="empty">没有匹配的单词</div>';
+    if(!filtered.length){
+      listEl.innerHTML = '<div class="empty">没有匹配的内容</div>';
       countEl.textContent = "0 个";
       return;
     }
-    countEl.textContent = items.length + " 个";
-    items.forEach(function(w){
+    countEl.textContent = filtered.length + " 个";
+    filtered.forEach(function(w){
       var card = document.createElement("div");
       card.className = "card" + (mastered.has(w.en) ? " done" : "");
 
@@ -577,8 +852,34 @@
     saveProgress();
   });
 
-  updateProgress();
-  render();
+  // ===== 模式切换（单词卡 / 常用句）=====
+  var modeTabs = Array.prototype.slice.call(document.querySelectorAll(".mode-tab"));
+  function switchMode(key){
+    if(!DATASETS[key] || key === activeKey) return;
+    activeKey = key;
+    items = DATASETS[activeKey].items;
+    mastered = loadLocalMastered(activeKey);
+    searchEl.value = "";
+    populateCats();
+    totalEl.textContent = items.length;
+    if(nounEl) nounEl.textContent = DATASETS[activeKey].noun;
+    updateProgress();
+    render();
+    modeTabs.forEach(function(b){ b.classList.toggle("active", b.dataset.mode === activeKey); });
+    loadProgress();
+  }
+  modeTabs.forEach(function(b){
+    b.addEventListener("click", function(){ switchMode(b.dataset.mode); });
+  });
+
+  // 初始化：支持 #words / #sentences 直达
+  var initialMode = (location.hash || "").replace("#","");
+  if(!DATASETS[initialMode]) initialMode = "words";
+  if(initialMode !== activeKey) switchMode(initialMode); else {
+    updateProgress();
+    render();
+    if(nounEl) nounEl.textContent = DATASETS[activeKey].noun;
+  }
   updateLoginUI();
   (async function(){
     if(account){
