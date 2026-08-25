@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>欧洲旅游英语单词卡</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --panel:#ffffff; --text:#1f2933; --muted:#7b8794;
+    --line:#e4e7eb; --accent:#2563eb; --accent-soft:#e8f0fe; --shadow:0 1px 3px rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  header{
+    background:var(--panel); border-bottom:1px solid var(--line);
+    padding:18px 20px 14px; position:sticky; top:0; z-index:10;
+  }
+  h1{font-size:20px; margin:0 0 2px;}
+  .sub{color:var(--muted); font-size:13px; margin:0 0 12px;}
+  .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  select, input[type=search]{
+    font-size:15px; padding:9px 12px; border:1px solid var(--line);
+    border-radius:10px; background:#fff; color:var(--text); outline:none;
+  }
+  select{min-width:130px;}
+  input[type=search]{flex:1; min-width:160px;}
+  select:focus, input[type=search]:focus{border-color:var(--accent);}
+  .count{color:var(--muted); font-size:13px; margin-left:auto;}
+  #status{
+    margin:10px 20px 0; font-size:13px; min-height:18px; color:var(--accent);
+    transition:opacity .2s;
+  }
+  main{
+    max-width:880px; margin:0 auto; padding:16px 20px 48px;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:14px;
+  }
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; box-shadow:var(--shadow); cursor:pointer;
+    display:flex; flex-direction:column; gap:6px; transition:transform .08s, box-shadow .15s;
+  }
+  .card:hover{transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.10);}
+  .card:active{transform:translateY(0);}
+  .row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .en{font-size:21px; font-weight:600; letter-spacing:.2px;}
+  .zh{font-size:15px; color:#374151;}
+  .phrase{font-size:13px; color:var(--muted); font-style:italic; margin-top:2px;}
+  .cat-tag{
+    display:inline-block; font-size:11px; color:var(--accent);
+    background:var(--accent-soft); border-radius:6px; padding:1px 7px; margin-top:2px;
+  }
+  .spk{
+    flex:0 0 auto; width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--line); background:#fff; color:var(--accent);
+    font-size:17px; display:flex; align-items:center; justify-content:center;
+    transition:background .15s;
+  }
+  .spk:hover{background:var(--accent-soft);}
+  .spk.playing{background:var(--accent); color:#fff;}
+  .empty{text-align:center; color:var(--muted); padding:40px 0; grid-column:1/-1;}
+  footer{text-align:center; color:var(--muted); font-size:12px; padding:0 20px 30px;}
+  @media (max-width:520px){
+    main{grid-template-columns:1fr;}
+    h1{font-size:18px;}
+  }
+  .progress-row{display:flex; align-items:center; gap:14px; margin-top:10px; font-size:13px; color:var(--muted);}
+  #progress{font-variant-numeric:tabular-nums;}
+  .link-btn{border:none; background:none; color:var(--accent); cursor:pointer; font-size:13px; padding:0; text-decoration:underline;}
+  .link-btn:hover{opacity:.8;}
+  .mastered-toggle{display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); margin-top:6px; cursor:pointer; user-select:none;}
+  .mastered-toggle input{accent-color:var(--accent); width:15px; height:15px; margin:0; cursor:pointer;}
+  .card.done{opacity:.55;}
+  .card.done .en{text-decoration:line-through;}
+  .login-row{display:flex; align-items:center; gap:10px; margin-top:8px; font-size:13px;}
+  .login-input{font-size:13px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; outline:none; width:200px;}
+  .login-input:focus{border-color:var(--accent);}
+  .account-tag{color:var(--accent); background:var(--accent-soft); border-radius:6px; padding:2px 8px; font-size:12px;}
+  .login-hint{margin-top:6px; font-size:12px; color:#b06a00; background:#fff7e6; border:1px solid #ffd591; border-radius:8px; padding:6px 10px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>欧洲旅游英语单词卡</h1>
+  <p class="sub">点卡片或喇叭即可朗读 · 按场景筛选 · 中英对照</p>
+  <div class="controls">
+    <select id="catFilter" aria-label="分类筛选"><option value="">全部分类</option></select>
+    <input type="search" id="search" placeholder="搜索英文 / 中文 / 例句…" aria-label="搜索">
+    <span class="count" id="count"></span>
+  </div>
+  <div class="progress-row">
+    <span id="progress">已掌握 0 / 0</span>
+    <button type="button" id="resetBtn" class="link-btn">重置进度</button>
+  </div>
+  <div class="login-row">
+    <span id="accountLabel" class="account-tag" style="display:none;"></span>
+    <input type="tel" id="phoneInput" class="login-input" placeholder="输入手机号登录（跨设备同步）" maxlength="11" inputmode="numeric">
+    <button type="button" id="loginBtn" class="link-btn">登录</button>
+    <button type="button" id="logoutBtn" class="link-btn" style="display:none;">退出</button>
+  </div>
+  <div id="loginHint" class="login-hint">未登录：进度仅保存在本机，不会跨设备同步。登录后可在任意设备查看。</div>
+</header>
+<div id="status" role="status" aria-live="polite"></div>
+<main id="list"></main>
+<footer>共 <span id="total">0</span> 个单词 · 数据本地内嵌，无需联网</footer>
+
+<script type="application/json" id="word-data">
+[
+  {"en":"passport","zh":"护照","cat":"机场出入境","phrase":"May I see your passport?"},
+  {"en":"boarding pass","zh":"登机牌","cat":"机场出入境","phrase":"Where is my boarding pass?"},
+  {"en":"baggage","zh":"行李","cat":"机场出入境","phrase":"Where can I collect my baggage?"},
+  {"en":"customs","zh":"海关","cat":"机场出入境","phrase":"This is for customs."},
+  {"en":"departure","zh":"出发；起飞","cat":"机场出入境","phrase":"What is the departure time?"},
+  {"en":"arrival","zh":"到达","cat":"机场出入境","phrase":"The arrival is delayed."},
+  {"en":"gate","zh":"登机口","cat":"机场出入境","phrase":"Which gate does it leave from?"},
+  {"en":"security check","zh":"安检","cat":"机场出入境","phrase":"Please go through security check."},
+  {"en":"visa","zh":"签证","cat":"机场出入境","phrase":"Do I need a visa?"},
+  {"en":"luggage cart","zh":"行李车","cat":"机场出入境","phrase":"Can I get a luggage cart?"},
+  {"en":"transfer","zh":"转机","cat":"机场出入境","phrase":"I have a transfer in Paris."},
+  {"en":"check-in","zh":"值机","cat":"机场出入境","phrase":"Where is the check-in counter?"},
+
+  {"en":"reservation","zh":"预订","cat":"酒店住宿","phrase":"I have a reservation."},
+  {"en":"reception","zh":"前台","cat":"酒店住宿","phrase":"Please go to the reception."},
+  {"en":"room key","zh":"房卡","cat":"酒店住宿","phrase":"I lost my room key."},
+  {"en":"single room","zh":"单人间","cat":"酒店住宿","phrase":"I would like a single room."},
+  {"en":"double room","zh":"双人间","cat":"酒店住宿","phrase":"A double room for two nights."},
+  {"en":"breakfast","zh":"早餐","cat":"酒店住宿","phrase":"Is breakfast included?"},
+  {"en":"towel","zh":"毛巾","cat":"酒店住宿","phrase":"Can I have more towels?"},
+  {"en":"wifi","zh":"无线网","cat":"酒店住宿","phrase":"What is the wifi password?"},
+  {"en":"checkout","zh":"退房","cat":"酒店住宿","phrase":"What time is checkout?"},
+  {"en":"air conditioning","zh":"空调","cat":"酒店住宿","phrase":"The air conditioning is broken."},
+  {"en":"wake-up call","zh":"叫醒电话","cat":"酒店住宿","phrase":"I need a wake-up call at seven."},
+  {"en":"elevator","zh":"电梯","cat":"酒店住宿","phrase":"Where is the elevator?"},
+  {"en":"hair dryer","zh":"吹风机","cat":"酒店住宿","phrase":"Is there a hair dryer?"},
+
+  {"en":"menu","zh":"菜单","cat":"餐厅点餐","phrase":"Can I see the menu?"},
+  {"en":"order","zh":"点餐；订单","cat":"餐厅点餐","phrase":"I would like to order."},
+  {"en":"bill","zh":"账单","cat":"餐厅点餐","phrase":"Could I have the bill, please?"},
+  {"en":"tip","zh":"小费","cat":"餐厅点餐","phrase":"Is the tip included?"},
+  {"en":"vegetarian","zh":"素食的","cat":"餐厅点餐","phrase":"I am vegetarian."},
+  {"en":"spicy","zh":"辣的","cat":"餐厅点餐","phrase":"Is it spicy?"},
+  {"en":"dessert","zh":"甜点","cat":"餐厅点餐","phrase":"What desserts do you have?"},
+  {"en":"drink","zh":"饮料","cat":"餐厅点餐","phrase":"A drink, please."},
+  {"en":"water","zh":"水","cat":"餐厅点餐","phrase":"A glass of water, please."},
+  {"en":"fork","zh":"叉子","cat":"餐厅点餐","phrase":"Could I have a fork?"},
+  {"en":"knife","zh":"刀","cat":"餐厅点餐","phrase":"I need a knife."},
+  {"en":"spoon","zh":"勺子","cat":"餐厅点餐","phrase":"A spoon, please."},
+  {"en":"napkin","zh":"餐巾","cat":"餐厅点餐","phrase":"May I have a napkin?"},
+  {"en":"delicious","zh":"美味的","cat":"餐厅点餐","phrase":"The food is delicious."},
+  {"en":"recommend","zh":"推荐","cat":"餐厅点餐","phrase":"What do you recommend?"},
+  {"en":"allergy","zh":"过敏","cat":"餐厅点餐","phrase":"I have a nut allergy."},
+  {"en":"refill","zh":"续杯","cat":"餐厅点餐","phrase":"Can I have a refill?"},
+
+  {"en":"train","zh":"火车","cat":"交通出行","phrase":"Where is the train station?"},
+  {"en":"subway","zh":"地铁","cat":"交通出行","phrase":"Which subway line goes downtown?"},
+  {"en":"bus","zh":"公交车","cat":"交通出行","phrase":"Which bus goes to the museum?"},
+  {"en":"ticket","zh":"票","cat":"交通出行","phrase":"One ticket to the city center."},
+  {"en":"platform","zh":"站台","cat":"交通出行","phrase":"Which platform is the train on?"},
+  {"en":"taxi","zh":"出租车","cat":"交通出行","phrase":"Please call a taxi."},
+  {"en":"rent a car","zh":"租车","cat":"交通出行","phrase":"I would like to rent a car."},
+  {"en":"gasoline","zh":"汽油","cat":"交通出行","phrase":"Where can I get gasoline?"},
+  {"en":"schedule","zh":"时刻表","cat":"交通出行","phrase":"What is the schedule?"},
+  {"en":"delay","zh":"延误","cat":"交通出行","phrase":"The train is delayed."},
+  {"en":"seat","zh":"座位","cat":"交通出行","phrase":"Is this seat taken?"},
+  {"en":"airport shuttle","zh":"机场大巴","cat":"交通出行","phrase":"Where is the airport shuttle?"},
+
+  {"en":"where","zh":"哪里","cat":"问路地标","phrase":"Where is the restroom?"},
+  {"en":"left","zh":"左","cat":"问路地标","phrase":"Turn left at the corner."},
+  {"en":"right","zh":"右","cat":"问路地标","phrase":"Turn right after the bridge."},
+  {"en":"straight","zh":"直走","cat":"问路地标","phrase":"Go straight ahead."},
+  {"en":"near","zh":"附近","cat":"问路地标","phrase":"Is there a bank near here?"},
+  {"en":"far","zh":"远","cat":"问路地标","phrase":"How far is the station?"},
+  {"en":"map","zh":"地图","cat":"问路地标","phrase":"Can you show me on the map?"},
+  {"en":"address","zh":"地址","cat":"问路地标","phrase":"What is the address?"},
+  {"en":"crossroad","zh":"十字路口","cat":"问路地标","phrase":"Stop at the crossroad."},
+  {"en":"traffic light","zh":"红绿灯","cat":"问路地标","phrase":"Turn at the traffic light."},
+  {"en":"entrance","zh":"入口","cat":"问路地标","phrase":"Where is the entrance?"},
+  {"en":"exit","zh":"出口","cat":"问路地标","phrase":"This is the exit."},
+  {"en":"block","zh":"街区","cat":"问路地标","phrase":"It is two blocks away."},
+  {"en":"north","zh":"北","cat":"问路地标","phrase":"The station is to the north."},
+  {"en":"south","zh":"南","cat":"问路地标","phrase":"Head south for five hundred meters."},
+  {"en":"east","zh":"东","cat":"问路地标","phrase":"The museum is east."},
+  {"en":"west","zh":"西","cat":"问路地标","phrase":"Walk west to the river."},
+
+  {"en":"price","zh":"价格","cat":"购物付款","phrase":"What is the price?"},
+  {"en":"cheap","zh":"便宜","cat":"购物付款","phrase":"Is this the cheapest?"},
+  {"en":"expensive","zh":"贵","cat":"购物付款","phrase":"That is too expensive."},
+  {"en":"discount","zh":"折扣","cat":"购物付款","phrase":"Is there a discount?"},
+  {"en":"cash","zh":"现金","cat":"购物付款","phrase":"Do you take cash?"},
+  {"en":"card","zh":"银行卡","cat":"购物付款","phrase":"Can I pay by card?"},
+  {"en":"receipt","zh":"收据","cat":"购物付款","phrase":"May I have a receipt?"},
+  {"en":"size","zh":"尺码","cat":"购物付款","phrase":"What size is this?"},
+  {"en":"try on","zh":"试穿","cat":"购物付款","phrase":"Can I try it on?"},
+  {"en":"sale","zh":"打折；促销","cat":"购物付款","phrase":"Is this on sale?"},
+  {"en":"supermarket","zh":"超市","cat":"购物付款","phrase":"Where is the supermarket?"},
+  {"en":"open","zh":"开门","cat":"购物付款","phrase":"What time do you open?"},
+  {"en":"closed","zh":"关门","cat":"购物付款","phrase":"The shop is closed."},
+  {"en":"refund","zh":"退款","cat":"购物付款","phrase":"I would like a refund."},
+  {"en":"bag","zh":"袋子","cat":"购物付款","phrase":"A bag, please."},
+
+  {"en":"doctor","zh":"医生","cat":"医疗急诊","phrase":"I need a doctor."},
+  {"en":"hospital","zh":"医院","cat":"医疗急诊","phrase":"Where is the hospital?"},
+  {"en":"pharmacy","zh":"药店","cat":"医疗急诊","phrase":"Is there a pharmacy nearby?"},
+  {"en":"medicine","zh":"药","cat":"医疗急诊","phrase":"I need some medicine."},
+  {"en":"pain","zh":"疼痛","cat":"医疗急诊","phrase":"I have a pain here."},
+  {"en":"headache","zh":"头痛","cat":"医疗急诊","phrase":"I have a headache."},
+  {"en":"fever","zh":"发烧","cat":"医疗急诊","phrase":"I have a fever."},
+  {"en":"stomach","zh":"胃","cat":"医疗急诊","phrase":"My stomach hurts."},
+  {"en":"prescription","zh":"处方","cat":"医疗急诊","phrase":"Do I need a prescription?"},
+  {"en":"ambulance","zh":"救护车","cat":"医疗急诊","phrase":"Call an ambulance!"},
+  {"en":"insurance","zh":"保险","cat":"医疗急诊","phrase":"Do you accept my insurance?"},
+  {"en":"sick","zh":"生病","cat":"医疗急诊","phrase":"I feel sick."},
+  {"en":"hurt","zh":"受伤","cat":"医疗急诊","phrase":"I hurt my leg."},
+  {"en":"bleed","zh":"流血","cat":"医疗急诊","phrase":"It is bleeding."},
+  {"en":"toothache","zh":"牙痛","cat":"医疗急诊","phrase":"I have a toothache."},
+
+  {"en":"hello","zh":"你好","cat":"社交礼貌","phrase":"Hello, nice to meet you."},
+  {"en":"thank you","zh":"谢谢","cat":"社交礼貌","phrase":"Thank you very much."},
+  {"en":"please","zh":"请","cat":"社交礼貌","phrase":"Please help me."},
+  {"en":"sorry","zh":"抱歉","cat":"社交礼貌","phrase":"Sorry, I do not understand."},
+  {"en":"excuse me","zh":"打扰一下","cat":"社交礼貌","phrase":"Excuse me, where is the restroom?"},
+  {"en":"yes","zh":"是","cat":"社交礼貌","phrase":"Yes, that is right."},
+  {"en":"no","zh":"不","cat":"社交礼貌","phrase":"No, thank you."},
+  {"en":"goodbye","zh":"再见","cat":"社交礼貌","phrase":"Goodbye, see you!"},
+  {"en":"help","zh":"帮忙","cat":"社交礼貌","phrase":"Can you help me?"},
+  {"en":"understand","zh":"理解","cat":"社交礼貌","phrase":"I do not understand."},
+  {"en":"speak","zh":"说","cat":"社交礼貌","phrase":"Do you speak Chinese?"},
+  {"en":"name","zh":"名字","cat":"社交礼貌","phrase":"My name is Xiaoqin."},
+  {"en":"nice","zh":"高兴","cat":"社交礼貌","phrase":"Nice to meet you."},
+  {"en":"friend","zh":"朋友","cat":"社交礼貌","phrase":"This is my friend."},
+  {"en":"welcome","zh":"欢迎","cat":"社交礼貌","phrase":"You are welcome."},
+
+  {"en":"one","zh":"一","cat":"数字时间","phrase":"One ticket, please."},
+  {"en":"two","zh":"二","cat":"数字时间","phrase":"Two coffees, please."},
+  {"en":"three","zh":"三","cat":"数字时间","phrase":"We need three rooms."},
+  {"en":"hundred","zh":"百","cat":"数字时间","phrase":"It is one hundred euros."},
+  {"en":"thousand","zh":"千","cat":"数字时间","phrase":"Two thousand only."},
+  {"en":"time","zh":"时间","cat":"数字时间","phrase":"What time is it?"},
+  {"en":"morning","zh":"早上","cat":"数字时间","phrase":"See you in the morning."},
+  {"en":"afternoon","zh":"下午","cat":"数字时间","phrase":"Good afternoon."},
+  {"en":"evening","zh":"晚上","cat":"数字时间","phrase":"Good evening."},
+  {"en":"yesterday","zh":"昨天","cat":"数字时间","phrase":"I arrived yesterday."},
+  {"en":"tomorrow","zh":"明天","cat":"数字时间","phrase":"We leave tomorrow."},
+  {"en":"today","zh":"今天","cat":"数字时间","phrase":"What is today's plan?"},
+  {"en":"week","zh":"周","cat":"数字时间","phrase":"I will stay one week."},
+  {"en":"euro","zh":"欧元","cat":"数字时间","phrase":"How many euros?"},
+
+  {"en":"police","zh":"警察","cat":"紧急情况","phrase":"Where is the police station?"},
+  {"en":"fire","zh":"火灾","cat":"紧急情况","phrase":"There is a fire!"},
+  {"en":"dangerous","zh":"危险","cat":"紧急情况","phrase":"That looks dangerous."},
+  {"en":"lost","zh":"迷路；丢失","cat":"紧急情况","phrase":"I am lost."},
+  {"en":"thief","zh":"小偷","cat":"紧急情况","phrase":"My phone was stolen."},
+  {"en":"emergency","zh":"紧急","cat":"紧急情况","phrase":"This is an emergency."},
+  {"en":"safe","zh":"安全","cat":"紧急情况","phrase":"Is it safe here?"},
+  {"en":"contact","zh":"联系","cat":"紧急情况","phrase":"Contact my embassy."},
+  {"en":"embassy","zh":"使馆","cat":"紧急情况","phrase":"Where is my embassy?"},
+
+  {"en":"weather","zh":"天气","cat":"日常表达","phrase":"What is the weather like?"},
+  {"en":"cold","zh":"冷","cat":"日常表达","phrase":"It is very cold."},
+  {"en":"hot","zh":"热","cat":"日常表达","phrase":"It is too hot."},
+  {"en":"toilet","zh":"洗手间","cat":"日常表达","phrase":"Where is the toilet?"},
+  {"en":"photo","zh":"照片","cat":"日常表达","phrase":"Can I take a photo?"},
+  {"en":"free","zh":"免费；有空","cat":"日常表达","phrase":"Is it free?"},
+  {"en":"toilet paper","zh":"卫生纸","cat":"日常表达","phrase":"Do you have toilet paper?"},
+  {"en":"charger","zh":"充电器","cat":"日常表达","phrase":"I need a charger."},
+  {"en":"language","zh":"语言","cat":"日常表达","phrase":"What language is this?"},
+  {"en":"money","zh":"钱","cat":"日常表达","phrase":"I need some money."},
+  {"en":"internet","zh":"网络","cat":"日常表达","phrase":"Is there internet here?"},
+  {"en":"tired","zh":"累","cat":"日常表达","phrase":"I am a bit tired."}
+]
+</script>
+
+<script type="module">
+(function(){
+  "use strict";
+  var WORDS = [];
+  try{
+    WORDS = JSON.parse(document.getElementById("word-data").textContent);
+  }catch(e){
+    console.error("词库解析失败：", e);
+    document.getElementById("list").innerHTML = '<div class="empty">词库加载失败</div>';
+    return;
+  }
+
+  // ===== 学习进度（云端同步 + 本地兜底） =====
+  // 云端接口：POST https://xiaoqin-d0g0prppaa09e675e.service.tcloudbase.com/wp
+  // 入参 { action:"get"|"set", uid, mastered:[...] }，返回 { ok, mastered:[...] }
+  var API = "https://xiaoqin-d0g0prppaa09e675e.service.tcloudbase.com/wp";
+  var mastered = new Set();
+
+  // uid 来源：登录后用手机号派生的稳定 uid（跨设备一致）；未登录用本机随机 uid（仅本机）
+  function genLocalUid(){
+    var u = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("u-" + Date.now() + "-" + Math.random().toString(16).slice(2));
+    return u;
+  }
+  var uid = localStorage.getItem("wq_uid") || genLocalUid();
+  localStorage.setItem("wq_uid", uid);
+  var account = localStorage.getItem("wq_account") || null; // 已登录手机号
+
+  // 手机号 -> 云端稳定 uid（SHA-256，避免直接暴露手机号）
+  async function accountUid(tel){
+    try{
+      var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(tel + "@euro-words"));
+      return "a-" + Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+    }catch(e){
+      // 兜底：不支持 subtle 时退化为简单哈希
+      var h = 0; for(var i=0;i<tel.length;i++){ h = (h*31 + tel.charCodeAt(i)) >>> 0; }
+      return "a-fallback-" + h;
+    }
+  }
+
+  function updateProgress(){
+    if(progressEl) progressEl.textContent = "已掌握 " + mastered.size + " / " + WORDS.length;
+  }
+
+  async function loadProgress(opts){
+    opts = opts || {};
+    // 先用本地兜底填充，保证秒开
+    try{
+      var raw = localStorage.getItem("wq_mastered");
+      if(raw){
+        var list = JSON.parse(raw);
+        if(Array.isArray(list)){
+          mastered.clear();
+          list.forEach(function(en){ if(en) mastered.add(en); });
+        }
+      }
+    }catch(e){ /* ignore */ }
+    // 再从云端拉取最新进度
+    try{
+      var res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "get", uid: uid })
+      });
+      var r = await res.json();
+      if(r && r.ok && Array.isArray(r.mastered)){
+        if(opts.merge){
+          // 合并模式：把云端进度合并进本地（用于登录时保留本机进度）
+          r.mastered.forEach(function(en){ if(en) mastered.add(en); });
+        }else{
+          // 覆盖模式：云端为准
+          mastered.clear();
+          r.mastered.forEach(function(en){ if(en) mastered.add(en); });
+        }
+      }
+    }catch(e){
+      console.warn("云端读取失败，使用本地进度：", e);
+      if(opts.showError) setStatus("同步失败，使用本地进度");
+    }
+    updateProgress();
+    render();
+  }
+
+  async function saveProgress(){
+    // 本地兜底写入
+    try{
+      localStorage.setItem("wq_mastered", JSON.stringify(Array.from(mastered)));
+    }catch(e){ /* ignore */ }
+    // 云端同步
+    try{
+      var res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "set", uid: uid, mastered: Array.from(mastered) })
+      });
+      var r = await res.json();
+      if(r && r.ok){
+        setStatus("进度已同步到云端");
+      }else{
+        setStatus("云端保存失败：" + (r && r.error ? r.error : "unknown"));
+      }
+    }catch(e){
+      console.warn("云端保存失败：", e);
+      setStatus("云端保存失败，仅本地生效");
+    }
+  }
+
+  function toggleMastered(en, on, cardEl){
+    if(on) mastered.add(en); else mastered.delete(en);
+    if(cardEl) cardEl.classList.toggle("done", on);
+    updateProgress();
+    saveProgress();
+  }
+
+  var listEl     = document.getElementById("list");
+  var catEl      = document.getElementById("catFilter");
+  var searchEl   = document.getElementById("search");
+  var statusEl   = document.getElementById("status");
+  var countEl    = document.getElementById("count");
+  var totalEl    = document.getElementById("total");
+  var progressEl = document.getElementById("progress");
+  var resetBtn   = document.getElementById("resetBtn");
+  var accountLabel = document.getElementById("accountLabel");
+  var phoneInput = document.getElementById("phoneInput");
+  var loginBtn   = document.getElementById("loginBtn");
+  var logoutBtn  = document.getElementById("logoutBtn");
+  var loginHint  = document.getElementById("loginHint");
+
+  function maskPhone(t){ return t.length >= 7 ? (t.slice(0,3) + "****" + t.slice(7)) : t; }
+  function updateLoginUI(){
+    if(account){
+      accountLabel.textContent = "已登录：" + maskPhone(account);
+      accountLabel.style.display = "";
+      phoneInput.style.display = "none";
+      loginBtn.style.display = "none";
+      logoutBtn.style.display = "";
+      loginHint.style.display = "none";
+    }else{
+      accountLabel.style.display = "none";
+      phoneInput.style.display = "";
+      loginBtn.style.display = "";
+      logoutBtn.style.display = "none";
+      loginHint.style.display = "";
+    }
+  }
+
+  loginBtn.addEventListener("click", async function(){
+    var tel = (phoneInput.value || "").trim();
+    if(!/^1\d{10}$/.test(tel)){ setStatus("请输入正确的 11 位手机号"); return; }
+    account = tel;
+    localStorage.setItem("wq_account", tel);
+    uid = await accountUid(tel);
+    localStorage.setItem("wq_uid", uid);
+    updateLoginUI();
+    // 登录时合并本机进度 + 云端进度，避免任一设备进度丢失
+    var localSnapshot = Array.from(mastered);
+    await loadProgress({ merge: true });
+    if(localSnapshot.length){
+      localSnapshot.forEach(function(e){ mastered.add(e); });
+      updateProgress(); render();
+      await saveProgress();
+    }
+    setStatus("已登录，进度跨设备同步");
+  });
+  logoutBtn.addEventListener("click", async function(){
+    localStorage.removeItem("wq_account");
+    account = null;
+    uid = genLocalUid();
+    localStorage.setItem("wq_uid", uid);
+    updateLoginUI();
+    await loadProgress();
+  });
+
+  // 分类下拉
+  var cats = [];
+  WORDS.forEach(function(w){ if(cats.indexOf(w.cat)<0) cats.push(w.cat); });
+  cats.sort();
+  cats.forEach(function(c){
+    var o = document.createElement("option");
+    o.value = c; o.textContent = c; catEl.appendChild(o);
+  });
+  totalEl.textContent = WORDS.length;
+
+  var statusTimer = null;
+  function setStatus(msg){
+    statusEl.textContent = msg || "";
+    if(statusTimer) clearTimeout(statusTimer);
+    if(msg){
+      statusTimer = setTimeout(function(){ statusEl.textContent = ""; }, 2500);
+    }
+  }
+
+  // ---- 朗读：默认英式 en-GB，无则回退 en-US ----
+  var voiceReady = false;
+  function pickVoice(){
+    if(!("speechSynthesis" in window)) return null;
+    var voices = window.speechSynthesis.getVoices();
+    if(!voices.length) return null;
+    return voices.find(function(v){ return v.lang === "en-GB"; })
+        || voices.find(function(v){ return v.lang === "en-US"; })
+        || voices.find(function(v){ return /^en/i.test(v.lang); })
+        || null;
+  }
+  function speak(text, btn){
+    if(!("speechSynthesis" in window)){
+      setStatus("此浏览器不支持语音朗读");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    var v = pickVoice();
+    if(v){ u.lang = v.lang; u.voice = v; }
+    else { u.lang = "en-GB"; }
+    u.rate = 0.95;
+    u.onstart = function(){ setStatus("正在朗读…"); if(btn) btn.classList.add("playing"); };
+    u.onend   = function(){ setStatus(""); if(btn) btn.classList.remove("playing"); };
+    u.onerror = function(){ setStatus("朗读失败，请重试"); if(btn) btn.classList.remove("playing"); };
+    window.speechSynthesis.speak(u);
+  }
+  if("speechSynthesis" in window){
+    if(window.speechSynthesis.getVoices().length){ voiceReady = true; }
+    window.speechSynthesis.onvoiceschanged = function(){ voiceReady = true; };
+  } else {
+    setStatus("提示：当前浏览器不支持语音，可用 Chrome / Edge / Safari");
+  }
+
+  function render(){
+    var cat = catEl.value;
+    var q = searchEl.value.trim().toLowerCase();
+    var items = WORDS.filter(function(w){
+      if(cat && w.cat !== cat) return false;
+      if(q){
+        var hay = (w.en + " " + w.zh + " " + (w.phrase||"")).toLowerCase();
+        if(hay.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+    listEl.innerHTML = "";
+    if(!items.length){
+      listEl.innerHTML = '<div class="empty">没有匹配的单词</div>';
+      countEl.textContent = "0 个";
+      return;
+    }
+    countEl.textContent = items.length + " 个";
+    items.forEach(function(w){
+      var card = document.createElement("div");
+      card.className = "card" + (mastered.has(w.en) ? " done" : "");
+
+      var row = document.createElement("div");
+      row.className = "row";
+
+      var left = document.createElement("div");
+      left.style.flex = "1";
+      var en = document.createElement("div");
+      en.className = "en"; en.textContent = w.en;
+      var zh = document.createElement("div");
+      zh.className = "zh"; zh.textContent = w.zh;
+      left.appendChild(en); left.appendChild(zh);
+
+      var spk = document.createElement("button");
+      spk.className = "spk"; spk.type = "button";
+      spk.setAttribute("aria-label", "朗读 " + w.en);
+      spk.textContent = "🔊";
+      spk.addEventListener("click", function(ev){
+        ev.stopPropagation();
+        speak(w.en, spk);
+      });
+
+      row.appendChild(left); row.appendChild(spk);
+
+      var tag = document.createElement("span");
+      tag.className = "cat-tag"; tag.textContent = w.cat;
+
+      card.appendChild(row);
+      if(w.phrase){ var p = document.createElement("div"); p.className="phrase"; p.textContent = w.phrase; card.appendChild(p); }
+      card.appendChild(tag);
+
+      var toggle = document.createElement("label");
+      toggle.className = "mastered-toggle";
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = mastered.has(w.en);
+      cb.setAttribute("aria-label", "标记 " + w.en + " 已掌握");
+      cb.addEventListener("click", function(ev){ ev.stopPropagation(); });
+      cb.addEventListener("change", function(){ toggleMastered(w.en, cb.checked, card); });
+      var tlabel = document.createElement("span");
+      tlabel.textContent = "已掌握";
+      toggle.appendChild(cb); toggle.appendChild(tlabel);
+      card.appendChild(toggle);
+
+      card.addEventListener("click", function(){ speak(w.en, spk); });
+      listEl.appendChild(card);
+    });
+  }
+
+  catEl.addEventListener("change", render);
+  searchEl.addEventListener("input", render);
+  resetBtn.addEventListener("click", function(){
+    mastered.clear();
+    updateProgress();
+    render();
+    saveProgress();
+  });
+
+  updateProgress();
+  render();
+  updateLoginUI();
+  (async function(){
+    if(account){
+      try{ uid = await accountUid(account); localStorage.setItem("wq_uid", uid); }catch(e){}
+    }
+    await loadProgress();
+  })();
+
+  // 切回页面时自动同步云端最新进度（跨设备场景）
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState === "visible"){
+      loadProgress({ showError: false });
+    }
+  });
+})();
+</script>
+</body>
+</html>
