@@ -6,8 +6,9 @@
 <title>欧洲旅游英语单词卡</title>
 <style>
   :root{
-    --bg:#f5f7fa; --panel:#ffffff; --text:#1f2933; --muted:#7b8794;
-    --line:#e4e7eb; --accent:#2563eb; --accent-soft:#e8f0fe; --shadow:0 1px 3px rgba(0,0,0,.08);
+    --bg:#f5f7fa; --panel:#ffffff; --text:#1f2933; --muted:#64748b;
+    --line:#e4e7eb; --accent:#0d9488; --accent-soft:#e6f4f1; --shadow:0 1px 3px rgba(0,0,0,.08);
+    --header-h:160px;
   }
   *{box-sizing:border-box;}
   body{
@@ -17,8 +18,9 @@
   }
   header{
     background:var(--panel); border-bottom:1px solid var(--line);
-    padding:18px 20px 14px; position:sticky; top:0; z-index:10;
+    padding:14px 20px 10px; position:sticky; top:0; z-index:10;
   }
+  .header-inner{max-width:880px; margin:0 auto;}
   h1{font-size:20px; margin:0 0 2px;}
   .sub{color:var(--muted); font-size:13px; margin:0 0 12px;}
   .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
@@ -29,6 +31,8 @@
   select{min-width:130px;}
   input[type=search]{flex:1; min-width:160px;}
   select:focus, input[type=search]:focus{border-color:var(--accent);}
+  :focus-visible{outline:none; box-shadow:0 0 0 3px rgba(13,148,136,.35); border-radius:8px;}
+  .card:focus-visible{box-shadow:0 0 0 3px rgba(13,148,136,.45);}
   .count{color:var(--muted); font-size:13px; margin-left:auto;}
   #status{
     margin:10px 20px 0; font-size:13px; min-height:18px; color:var(--accent);
@@ -68,6 +72,34 @@
     main{grid-template-columns:1fr;}
     h1{font-size:18px;}
   }
+  .extras-toggle{
+    display:inline-block; margin-top:10px; border:1px solid var(--line);
+    background:#fff; color:var(--accent); border-radius:999px;
+    font-size:13px; padding:6px 14px; cursor:pointer;
+  }
+  .header-extras{display:none; margin-top:10px;}
+  .header-extras.open{display:block;}
+  .group-head{
+    grid-column:1/-1; position:sticky; top:var(--header-h); z-index:5;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:7px 12px; margin:4px 0 2px;
+    font-size:13px; font-weight:600; color:var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card, .spk, .mode-tab, #status{transition:none!important;}
+    .card:hover{transform:none!important;}
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1419; --panel:#1a2029; --text:#e4e7eb; --muted:#9aa5b1;
+      --line:#2a323d; --accent:#2dd4bf; --accent-soft:#0f3b38; --shadow:0 1px 3px rgba(0,0,0,.4);
+    }
+    select, input[type=search], .login-input, .spk, .mode-tab{background:#161c24; color:var(--text);}
+    .mode-tab.active{background:var(--accent-soft); color:var(--accent); border-color:var(--accent);}
+    .spk.playing{background:var(--accent); color:#06201d;}
+    .login-hint{background:#2a2113; border-color:#5c4a1f; color:#e0b070;}
+    .account-tag{background:var(--accent-soft);}
+  }
   .progress-row{display:flex; align-items:center; gap:14px; margin-top:10px; font-size:13px; color:var(--muted);}
   #progress{font-variant-numeric:tabular-nums;}
   .link-btn{border:none; background:none; color:var(--accent); cursor:pointer; font-size:13px; padding:0; text-decoration:underline;}
@@ -80,7 +112,7 @@
   .login-input{font-size:13px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; outline:none; width:200px;}
   .login-input:focus{border-color:var(--accent);}
   .account-tag{color:var(--accent); background:var(--accent-soft); border-radius:6px; padding:2px 8px; font-size:12px;}
-  .login-hint{margin-top:6px; font-size:12px; color:#b06a00; background:#fff7e6; border:1px solid #ffd591; border-radius:8px; padding:6px 10px;}
+  .login-hint{margin-top:6px; font-size:12px; color:#8a4b00; background:#fff7e6; border:1px solid #f0d9b0; border-radius:8px; padding:6px 10px;}
   .mode-tabs{display:flex; gap:8px; margin:12px 0 6px;}
   .mode-tab{font-size:14px; padding:7px 18px; border:1px solid var(--line); background:#fff; color:var(--text); border-radius:999px; cursor:pointer; transition:border-color .15s, background .15s, color .15s;}
   .mode-tab:hover{border-color:var(--accent);}
@@ -89,31 +121,36 @@
 </head>
 <body>
 <header>
-  <h1>欧洲旅游英语随身学</h1>
-  <p class="sub">单词卡 / 常用句 · 点卡片或喇叭即可朗读 · 中英对照 · 按场景筛选</p>
-  <div class="mode-tabs" role="tablist" aria-label="学习模式">
-    <button type="button" class="mode-tab active" data-mode="words" role="tab">单词卡</button>
-    <button type="button" class="mode-tab" data-mode="sentences" role="tab">常用句</button>
+  <div class="header-inner">
+    <h1>欧洲旅游英语随身学</h1>
+    <p class="sub">单词卡 / 常用句 · 点卡片或喇叭即可朗读 · 中英对照 · 按场景筛选</p>
+    <div class="mode-tabs" role="tablist" aria-label="学习模式">
+      <button type="button" class="mode-tab active" data-mode="words" role="tab" id="tab-words" aria-selected="true" aria-controls="list" tabindex="0">单词卡</button>
+      <button type="button" class="mode-tab" data-mode="sentences" role="tab" id="tab-sentences" aria-selected="false" aria-controls="list" tabindex="-1">常用句</button>
+    </div>
+    <div class="controls">
+      <select id="catFilter" aria-label="分类筛选"><option value="">全部分类</option></select>
+      <input type="search" id="search" placeholder="搜索英文 / 中文 / 例句…" aria-label="搜索">
+      <span class="count" id="count"></span>
+    </div>
+    <button type="button" class="extras-toggle" id="extrasToggle" aria-expanded="false" aria-controls="headerExtras">更多设置 ▾</button>
+    <div class="header-extras" id="headerExtras">
+      <div class="progress-row">
+        <span id="progress">已掌握 0 / 0</span>
+        <button type="button" id="resetBtn" class="link-btn">重置进度</button>
+      </div>
+      <div class="login-row">
+        <span id="accountLabel" class="account-tag" style="display:none;"></span>
+        <input type="tel" id="phoneInput" class="login-input" placeholder="输入手机号登录（跨设备同步）" maxlength="11" inputmode="numeric">
+        <button type="button" id="loginBtn" class="link-btn">登录</button>
+        <button type="button" id="logoutBtn" class="link-btn" style="display:none;">退出</button>
+      </div>
+      <div id="loginHint" class="login-hint">未登录：进度仅保存在本机，不会跨设备同步。登录后可在任意设备查看。</div>
+    </div>
   </div>
-  <div class="controls">
-    <select id="catFilter" aria-label="分类筛选"><option value="">全部分类</option></select>
-    <input type="search" id="search" placeholder="搜索英文 / 中文 / 例句…" aria-label="搜索">
-    <span class="count" id="count"></span>
-  </div>
-  <div class="progress-row">
-    <span id="progress">已掌握 0 / 0</span>
-    <button type="button" id="resetBtn" class="link-btn">重置进度</button>
-  </div>
-  <div class="login-row">
-    <span id="accountLabel" class="account-tag" style="display:none;"></span>
-    <input type="tel" id="phoneInput" class="login-input" placeholder="输入手机号登录（跨设备同步）" maxlength="11" inputmode="numeric">
-    <button type="button" id="loginBtn" class="link-btn">登录</button>
-    <button type="button" id="logoutBtn" class="link-btn" style="display:none;">退出</button>
-  </div>
-  <div id="loginHint" class="login-hint">未登录：进度仅保存在本机，不会跨设备同步。登录后可在任意设备查看。</div>
 </header>
 <div id="status" role="status" aria-live="polite"></div>
-<main id="list"></main>
+<main id="list" role="tabpanel" aria-label="单词与例句列表"></main>
 <footer>共 <span id="total">0</span> 个<span id="noun">单词</span> · 数据本地内嵌，无需联网</footer>
 
 <script type="application/json" id="word-data">
@@ -853,27 +890,39 @@
     }
   }
 
-  // ---- 朗读：默认英式 en-GB，无则回退 en-US ----
+  // ---- 朗读：按词库语言选 voice；默认英式 en-GB，无则回退 en-US ----
+  // 仅「意大利语/法语/瑞士」等外语分类用对应语言朗读，其余英文场景用 en-GB
+  var LANG_MAP = {
+    "意大利语":"it-IT", "意大利":"it-IT",
+    "法语":"fr-FR", "法国":"fr-FR",
+    "瑞士":"de-CH", "瑞士出行":"de-CH"
+  };
   var voiceReady = false;
-  function pickVoice(){
+  function pickVoice(preferredLang){
     if(!("speechSynthesis" in window)) return null;
-    var voices = window.speechSynthesis.getVoices();
+    var voices = window.speechSynthesis.getVoices() || [];
     if(!voices.length) return null;
+    if(preferredLang){
+      var matched = voices.find(function(x){
+        return x.lang && x.lang.toLowerCase().indexOf(preferredLang.toLowerCase()) === 0;
+      });
+      if(matched) return matched;
+    }
     return voices.find(function(v){ return v.lang === "en-GB"; })
         || voices.find(function(v){ return v.lang === "en-US"; })
         || voices.find(function(v){ return /^en/i.test(v.lang); })
         || null;
   }
-  function speak(text, btn){
+  function speak(text, btn, lang){
     if(!("speechSynthesis" in window)){
       setStatus("此浏览器不支持语音朗读");
       return;
     }
     window.speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);
-    var v = pickVoice();
+    var v = pickVoice(lang);
     if(v){ u.lang = v.lang; u.voice = v; }
-    else { u.lang = "en-GB"; }
+    else { u.lang = lang || "en-GB"; }
     u.rate = 0.95;
     u.onstart = function(){ setStatus("正在朗读…"); if(btn) btn.classList.add("playing"); };
     u.onend   = function(){ setStatus(""); if(btn) btn.classList.remove("playing"); };
@@ -905,9 +954,22 @@
       return;
     }
     countEl.textContent = filtered.length + " 个";
+    var langOf = function(w){ return LANG_MAP[w.cat] || null; };
+    var lastGroup = null;
     filtered.forEach(function(w){
+      // 「全部分类」时按分类插入 sticky 分组标题，便于扫读
+      if(!cat && w.cat !== lastGroup){
+        lastGroup = w.cat;
+        var gh = document.createElement("div");
+        gh.className = "group-head";
+        gh.textContent = w.cat;
+        listEl.appendChild(gh);
+      }
+
       var card = document.createElement("div");
       card.className = "card" + (mastered.has(w.en) ? " done" : "");
+      card.tabIndex = 0;
+      card.setAttribute("aria-label", "点击朗读 " + w.en);
 
       var row = document.createElement("div");
       row.className = "row";
@@ -924,9 +986,10 @@
       spk.className = "spk"; spk.type = "button";
       spk.setAttribute("aria-label", "朗读 " + w.en);
       spk.textContent = "🔊";
+      var lang = langOf(w);
       spk.addEventListener("click", function(ev){
         ev.stopPropagation();
-        speak(w.en, spk);
+        speak(w.en, spk, lang);
       });
 
       row.appendChild(left); row.appendChild(spk);
@@ -951,7 +1014,14 @@
       toggle.appendChild(cb); toggle.appendChild(tlabel);
       card.appendChild(toggle);
 
-      card.addEventListener("click", function(){ speak(w.en, spk); });
+      // 整卡点按 / 键盘（Enter、空格）均可朗读，与鼠标行为对齐
+      card.addEventListener("click", function(){ speak(w.en, spk, lang); });
+      card.addEventListener("keydown", function(e){
+        if(e.target === card && (e.key === "Enter" || e.key === " ")){
+          e.preventDefault();
+          speak(w.en, spk, lang);
+        }
+      });
       listEl.appendChild(card);
     });
   }
@@ -978,12 +1048,48 @@
     if(nounEl) nounEl.textContent = DATASETS[activeKey].noun;
     updateProgress();
     render();
-    modeTabs.forEach(function(b){ b.classList.toggle("active", b.dataset.mode === activeKey); });
+    modeTabs.forEach(function(b){
+      var on = b.dataset.mode === activeKey;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+      b.tabIndex = on ? 0 : -1;
+    });
+    listEl.setAttribute("aria-labelledby", activeKey === "words" ? "tab-words" : "tab-sentences");
     loadProgress();
   }
   modeTabs.forEach(function(b){
     b.addEventListener("click", function(){ switchMode(b.dataset.mode); });
   });
+  // 标签页键盘导航（左右/上下/Home/End），符合 WAI-ARIA tabs 模式
+  var tabsWrap = document.querySelector(".mode-tabs");
+  tabsWrap.addEventListener("keydown", function(e){
+    var idx = modeTabs.indexOf(document.activeElement);
+    if(idx < 0) return;
+    var next = -1;
+    if(e.key === "ArrowRight" || e.key === "ArrowDown") next = (idx + 1) % modeTabs.length;
+    else if(e.key === "ArrowLeft" || e.key === "ArrowUp") next = (idx - 1 + modeTabs.length) % modeTabs.length;
+    else if(e.key === "Home") next = 0;
+    else if(e.key === "End") next = modeTabs.length - 1;
+    if(next >= 0){ e.preventDefault(); modeTabs[next].focus(); switchMode(modeTabs[next].dataset.mode); }
+  });
+
+  // 「更多设置」折叠：把进度 / 登录区收起，首屏更清爽
+  var extrasToggle = document.getElementById("extrasToggle");
+  var headerExtras = document.getElementById("headerExtras");
+  // 分组标题 sticky 偏移 = header 真实高度（折叠/展开/缩放都重测，避免错位）
+  function syncHeaderH(){
+    var h = document.querySelector("header");
+    if(h) document.documentElement.style.setProperty("--header-h", h.offsetHeight + "px");
+  }
+  extrasToggle.addEventListener("click", function(){
+    var open = headerExtras.classList.toggle("open");
+    extrasToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    extrasToggle.textContent = open ? "收起设置 ▴" : "更多设置 ▾";
+    syncHeaderH();
+  });
+  window.addEventListener("resize", syncHeaderH);
+  listEl.setAttribute("aria-labelledby", "tab-words");
+  syncHeaderH();
 
   // 初始化：支持 #words / #sentences 直达
   var initialMode = (location.hash || "").replace("#","");
