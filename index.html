@@ -9,7 +9,6 @@
   :root{
     --bg:#f5fbf7; --panel:#ffffff; --text:#1f2933; --muted:#64748b;
     --line:#dfe8e4; --accent:#0d9488; --accent-soft:#e6f4f1; --shadow:0 10px 30px rgba(15,64,56,.08);
-    --header-h:160px;
   }
   *{box-sizing:border-box;}
   body{
@@ -22,8 +21,7 @@
     line-height:1.5; -webkit-font-smoothing:antialiased;
   }
   header{
-    padding:18px 20px 12px; position:sticky; top:0; z-index:10;
-    background:rgba(245,251,247,.82); backdrop-filter:blur(18px);
+    padding:18px 20px 12px;
   }
   .header-inner{
     max-width:960px; margin:0 auto; padding:18px; border:1px solid rgba(255,255,255,.8);
@@ -114,7 +112,7 @@
   .header-extras{display:none; margin-top:10px;}
   .header-extras.open{display:block;}
   .group-head{
-    grid-column:1/-1; position:sticky; top:var(--header-h); z-index:5;
+    grid-column:1/-1;
     background:rgba(255,255,255,.94); border:1px solid var(--line); border-radius:16px;
     padding:7px 12px; margin:4px 0 2px;
     font-size:13px; font-weight:600; color:var(--accent);
@@ -1015,7 +1013,7 @@
     var visible = filtered.slice();
     if(!cat){ visible.sort(function(a,b){ return a.cat.localeCompare(b.cat, "zh-CN"); }); }
     visible.forEach(function(w){
-      // 「全部分类」时按分类插入 sticky 分组标题，便于扫读
+      // 「全部分类」时按分类插入分组标题，便于扫读
       if(!cat && w.cat !== lastGroup){
         lastGroup = w.cat;
         var gh = document.createElement("div");
@@ -1143,20 +1141,12 @@
   // 「更多设置」折叠：把进度 / 登录区收起，首屏更清爽
   var extrasToggle = document.getElementById("extrasToggle");
   var headerExtras = document.getElementById("headerExtras");
-  // 分组标题 sticky 偏移 = header 真实高度（折叠/展开/缩放都重测，避免错位）
-  function syncHeaderH(){
-    var h = document.querySelector("header");
-    if(h) document.documentElement.style.setProperty("--header-h", h.offsetHeight + "px");
-  }
   extrasToggle.addEventListener("click", function(){
     var open = headerExtras.classList.toggle("open");
     extrasToggle.setAttribute("aria-expanded", open ? "true" : "false");
     extrasToggle.textContent = open ? "收起设置 ▴" : "更多设置 ▾";
-    syncHeaderH();
   });
-  window.addEventListener("resize", syncHeaderH);
   listEl.setAttribute("aria-labelledby", "tab-words");
-  syncHeaderH();
 
   // 初始化：支持 #words / #sentences 直达
   var initialMode = (location.hash || "").replace("#","");
