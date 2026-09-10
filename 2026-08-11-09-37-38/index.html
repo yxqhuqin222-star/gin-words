@@ -728,7 +728,7 @@
   var API = "https://xiaoqin-d0g0prppaa09e675e.service.tcloudbase.com/wp";
   var mastered = new Set();
 
-  // 进度按数据集分别存储：本地独立 key；云端仅 words（旧云函数不支持 scope 隔离，常用句纯本地）
+  // 进度按数据集分别存储：本地独立 key；登录后两个数据集都同步到云端
   (function(){
     try{
       if(!localStorage.getItem("wq_mastered_words") && localStorage.getItem("wq_mastered")){
@@ -777,8 +777,8 @@
     opts = opts || {};
     // 本地兜底优先：按当前数据集读取，保证秒开
     mastered = loadLocalMastered(activeKey);
-    // 云端同步（仅 words 数据集，旧云函数不支持 scope 隔离）
-    if(activeKey === "words"){
+    // 登录后按数据集同步云端；匿名状态只使用本机进度
+    if(account){
       try{
         var res = await fetch(API, {
           method: "POST",
@@ -806,8 +806,8 @@
   async function saveProgress(){
     // 本地兜底写入（按当前数据集）
     saveLocalMastered(activeKey, mastered);
-    // 云端同步（仅 words 数据集；常用句纯本地，避免污染旧云函数的单一进度字段）
-    if(activeKey !== "words") return;
+    // 匿名状态只保存本机；登录后按数据集同步云端
+    if(!account) return;
     try{
       var res = await fetch(API, {
         method: "POST",
@@ -867,7 +867,7 @@
   }
 
   loginBtn.addEventListener("click", async function(){
-    var tel = (phoneInput.value || "").trim();
+    var tel = (phoneInput.value || "").replace(/\D/g, "");
     if(!/^1\d{10}$/.test(tel)){ setStatus("请输入正确的 11 位手机号"); return; }
     account = tel;
     localStorage.setItem("wq_account", tel);

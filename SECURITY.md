@@ -4,7 +4,7 @@
 
 - **部署配置**：`cloudbaserc.json`、`cloudfunctions/wordProgress/`、`2026-08-11-09-37-38/index.html` 中引用了 CloudBase 环境 ID（`xiaoqin-...`）与云函数 API 地址。这些是环境标识，非密钥，但公开后会暴露部署位置。
 - **云函数后端**：`cloudfunctions/wordProgress/index.js` 直接读写进度数据表，依赖 CloudBase 环境鉴权。
-- **用户数据**：进度数据按 `uid`（浏览器 `localStorage` 生成）隔离，不收集任何个人身份信息。
+- **用户数据**：未登录进度只保存在本机；登录后使用手机号派生的稳定哈希 `uid`，按账号和数据集隔离同步，不在云端保存手机号。
 
 ## 私有报告
 

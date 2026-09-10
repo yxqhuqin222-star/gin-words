@@ -3,6 +3,7 @@
 // 服务端使用 app.rdb()（PostgREST/Supabase 风格）读写 word_progress 表。
 const http = require('http');
 const cloudbase = require('@cloudbase/node-sdk');
+const { normalizeScope, getProgress, setProgress } = require('./progress-store');
 const ENV = 'xiaoqin-d0g0prppaa09e675e';
 
 const app = cloudbase.init({ env: ENV });
@@ -41,18 +42,18 @@ const server = http.createServer(async (req, res) => {
 
   try {
     const event = await readBody(req);
-    const { action = 'get', uid, mastered } = event || {};
+    const { action = 'get', uid, scope, mastered } = event || {};
     if (!uid) return send(res, { ok: false, error: 'uid required' });
+    const normalizedScope = normalizeScope(scope);
 
     if (action === 'get') {
-      const r = await db.from('word_progress').select().eq('uid', uid);
-      const row = r.data && r.data[0];
-      return send(res, { ok: true, mastered: row ? (row.mastered || []) : [] });
+      const list = await getProgress(db, uid, normalizedScope);
+      return send(res, { ok: true, mastered: list });
     }
 
     if (action === 'set') {
       const list = Array.isArray(mastered) ? mastered : [];
-      const r = await db.from('word_progress').upsert({ uid, mastered: list });
+      const r = await setProgress(db, uid, normalizedScope, list);
       return send(res, { ok: true, status: r.status, data: r.data });
     }
 
