@@ -733,25 +733,63 @@
     if(progressEl) progressEl.textContent = "已掌握 " + mastered.size + " / " + items.length;
   }
 
+  var saveQueues = {};
+  function saveProgress(scope, set){
+    scope = scope || activeKey;
+    var snapshot = Array.from(set || mastered);
+    saveLocalMastered(scope, new Set(snapshot));
+    if(!account) return Promise.resolve();
+
+    // 同一数据集的写入必须按点击顺序完成，避免旧请求覆盖新列表。
+    var accountSnapshot = account;
+    var uidSnapshot = uid;
+    var previous = saveQueues[scope] || Promise.resolve();
+    var current = previous.catch(function(){}).then(async function(){
+      if(account !== accountSnapshot || uid !== uidSnapshot) return;
+      try{
+        var res = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "set", uid: uidSnapshot, scope: scope, mastered: snapshot })
+        });
+        var r = await res.json();
+        if(r && r.ok){
+          setStatus("进度已同步到云端");
+        }else{
+          setStatus("云端保存失败：" + (r && r.error ? r.error : "unknown"));
+        }
+      }catch(e){
+        console.warn("云端保存失败：", e);
+        setStatus("云端保存失败，仅本地生效");
+      }
+    });
+    saveQueues[scope] = current.catch(function(){});
+    return current;
+  }
+
   async function loadProgress(opts){
     opts = opts || {};
-    // 本地兜底优先：按当前数据集读取，保证秒开
-    mastered = loadLocalMastered(activeKey);
-    // 登录后按数据集同步云端；匿名状态只使用本机进度
+    var scope = opts.scope || activeKey;
+    var merge = opts.merge !== false;
+    var next = loadLocalMastered(scope);
+    var shouldPersist = false;
+    // 登录后按数据集合并云端进度；匿名状态只使用本机进度。
     if(account){
       try{
         var res = await fetch(API, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "get", uid: uid, scope: activeKey })
+          body: JSON.stringify({ action: "get", uid: uid, scope: scope })
         });
         var r = await res.json();
         if(r && r.ok && Array.isArray(r.mastered)){
-          if(opts.merge){
-            r.mastered.forEach(function(en){ if(en) mastered.add(en); });
+          var cloud = new Set(r.mastered.filter(function(en){ return en; }));
+          if(merge){
+            var localSize = next.size;
+            cloud.forEach(function(en){ next.add(en); });
+            shouldPersist = next.size > cloud.size || next.size > localSize && next.size !== cloud.size;
           }else{
-            mastered = new Set();
-            r.mastered.forEach(function(en){ if(en) mastered.add(en); });
+            next = cloud;
           }
         }
       }catch(e){
@@ -759,38 +797,20 @@
         if(opts.showError) setStatus("同步失败，使用本地进度");
       }
     }
-    updateProgress();
-    render();
-  }
-
-  async function saveProgress(){
-    // 本地兜底写入（按当前数据集）
-    saveLocalMastered(activeKey, mastered);
-    // 匿名状态只保存本机；登录后按数据集同步云端
-    if(!account) return;
-    try{
-      var res = await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "set", uid: uid, scope: activeKey, mastered: Array.from(mastered) })
-      });
-      var r = await res.json();
-      if(r && r.ok){
-        setStatus("进度已同步到云端");
-      }else{
-        setStatus("云端保存失败：" + (r && r.error ? r.error : "unknown"));
-      }
-    }catch(e){
-      console.warn("云端保存失败：", e);
-      setStatus("云端保存失败，仅本地生效");
+    saveLocalMastered(scope, next);
+    if(scope === activeKey){
+      mastered = next;
+      updateProgress();
+      render();
     }
+    if(shouldPersist) await saveProgress(scope, next);
   }
 
   function toggleMastered(en, on, cardEl){
     if(on) mastered.add(en); else mastered.delete(en);
     if(cardEl) cardEl.classList.toggle("done", on);
     updateProgress();
-    saveProgress();
+    saveProgress(activeKey, mastered);
   }
 
   var listEl     = document.getElementById("list");
@@ -835,13 +855,7 @@
     localStorage.setItem("wq_uid", uid);
     updateLoginUI();
     // 登录时合并本机进度 + 云端进度，避免任一设备进度丢失
-    var localSnapshot = Array.from(mastered);
     await loadProgress({ merge: true });
-    if(localSnapshot.length){
-      localSnapshot.forEach(function(e){ mastered.add(e); });
-      updateProgress(); render();
-      await saveProgress();
-    }
     setStatus("已登录，进度跨设备同步");
   });
   logoutBtn.addEventListener("click", async function(){
@@ -1070,7 +1084,7 @@
     mastered.clear();
     updateProgress();
     render();
-    saveProgress();
+    saveProgress(activeKey, mastered);
   });
 
   // ===== 模式切换（单词卡 / 常用句）=====
@@ -1093,7 +1107,7 @@
       b.tabIndex = on ? 0 : -1;
     });
     listEl.setAttribute("aria-labelledby", activeKey === "words" ? "tab-words" : "tab-sentences");
-    loadProgress();
+    loadProgress({ scope: key });
   }
   modeTabs.forEach(function(b){
     b.addEventListener("click", function(){ switchMode(b.dataset.mode); });
