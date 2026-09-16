@@ -53,7 +53,9 @@ async def generate(dataset_key: str, items: list[dict]) -> None:
 
 async def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    await generate("words", load_dataset("word-data"))
+    words = load_dataset("word-data")
+    words.extend(load_dataset("life-word-data"))
+    await generate("words", words)
     await generate("sentences", load_dataset("sentence-data"))
 
 

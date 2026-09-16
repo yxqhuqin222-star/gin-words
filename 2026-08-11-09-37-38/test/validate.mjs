@@ -27,6 +27,19 @@ try {
   process.exit(1);
 }
 
+const lifeMatch = html.match(
+  /<script type="application\/json" id="life-word-data">([\s\S]*?)<\/script>/
+);
+if (lifeMatch) {
+  try {
+    const lifeWords = JSON.parse(lifeMatch[1]);
+    if (Array.isArray(lifeWords)) words = words.concat(lifeWords);
+  } catch (e) {
+    console.error("✗ 生活常用词库 JSON 解析失败：", e.message);
+    process.exit(1);
+  }
+}
+
 const errors = [];
 
 if (!Array.isArray(words)) errors.push("词库不是数组");
