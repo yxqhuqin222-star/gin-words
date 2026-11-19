@@ -6,6 +6,6 @@
     "test": "node --test test/progress-store.test.js"
   },
   "dependencies": {
-    "@cloudbase/node-sdk": "^3.18.3"
+    "@cloudbase/node-sdk": "^4.2.1"
   }
 }
